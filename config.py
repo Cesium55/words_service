@@ -6,3 +6,9 @@ DB_HOST = os.environ.get("DB_HOST")
 DB_NAME = os.environ.get("DB_NAME")
 DB_USER = os.environ.get("DB_USER")
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
+
+AUTH_SERVICE_URL = os.environ.get("AUTH_SERVICE_URL")
+AUTH_GET_PUBLIC_KEY_URL = AUTH_SERVICE_URL + "/api/v1/public-key"
+
+REDIS_HOST = os.environ.get("REDIS_HOST")
+REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")

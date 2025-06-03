@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from routes.debug_init import router as debug_init_router
-from routes.categories import router as categories_router
+from routes import categories_router, debug_init_router
 from fastapi.middleware.cors import CORSMiddleware
 
 

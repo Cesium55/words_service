@@ -2,9 +2,18 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_async_session
 from models import Category
+from managers.AuthManager import AuthManager
 
 router = APIRouter(prefix="/debug_init")
 
+
+
+@router.post("/init_public_key")
+async def init_public_key():
+    auth_manager = AuthManager()
+
+    key = await auth_manager.public_key_init()
+    return key
 
 # @router.post("/create_my_cats")
 # async def create_my_cats(session: AsyncSession = Depends(get_async_session)):
