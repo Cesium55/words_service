@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from routes import categories_router, debug_init_router
+from routes import categories_router, debug_init_router, admin_router
 from fastapi.middleware.cors import CORSMiddleware
+from config import APP_DEBUG
 
 
 app = FastAPI()
@@ -13,12 +14,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-if 1:
+if APP_DEBUG:
     app.include_router(debug_init_router)
 
 
 app.include_router(categories_router)
+app.include_router(admin_router)
 
 
 @app.get("/")

@@ -1,11 +1,48 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_async_session
-from models import Category
+from models import (
+    Category,
+    Language,
+    Word,
+    WordTranslation,
+    Example,
+    ExampleTranslation,
+    category_word_table,
+)
 from managers.AuthManager import AuthManager
+from managers.Logger import AsyncLogger
+from pydantic import BaseModel
+from typing import List
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload, joinedload
+
+from schemas.words import WordsReturnSchema
 
 router = APIRouter(prefix="/debug_init")
+logger = AsyncLogger()
 
+
+@router.get("/words", 
+            response_model=WordsReturnSchema
+            )
+async def get_words(session: AsyncSession = Depends(get_async_session)):
+    query = (
+        select(Word)
+        .options(
+            selectinload(Word.categories),
+            selectinload(Word.translations).selectinload(WordTranslation.language),
+            selectinload(Word.examples).selectinload(Example.translations),
+        )
+        .limit(20)
+    )
+    data = await session.execute(query)
+    return {"data": data.scalars().all()}
+
+
+@router.get("/")
+def asdasd():
+    return 123
 
 
 @router.post("/init_public_key")
@@ -14,6 +51,98 @@ async def init_public_key():
 
     key = await auth_manager.public_key_init()
     return key
+
+
+@router.get("/public_key")
+async def get_public_key():
+    await logger.info("get public key call")
+
+    am = AuthManager()
+    key = await am.get_auth_public_key()
+    return key
+
+
+########################################################################
+
+# Pydantic-схемы
+# class TranslationIn(BaseModel):
+#     lang: str
+#     text: str
+
+# class ExampleIn(BaseModel):
+#     lang: str
+#     text: str
+
+# class WordDataIn(BaseModel):
+#     transcription: str
+#     translations: List[TranslationIn]
+#     examples: List[ExampleIn] = []
+#     categories: List[str] = []
+
+# class WordImportPayload(BaseModel):
+#     data: List[WordDataIn]
+
+
+# @router.post("/import-words")
+# async def import_words(payload: WordImportPayload, session: AsyncSession = Depends(get_async_session)):
+#     # Получаем языки в виде dict
+#     result = await session.execute(select(Language.id, Language.code))
+#     language_map = {code: id_ for id_, code in result.all()}
+
+#     # Получаем существующие категории
+#     result = await session.execute(select(Category.id, Category.name).where(Category.owner_id == None))
+#     category_map = {name: id_ for id_, name in result.all()}
+
+#     # Словарь для сохранения новых категорий, чтобы не делать insert дубли
+#     new_categories = {}
+
+#     for word_data in payload.data:
+#         # 1. Создаём слово
+#         word = Word(transcription=word_data.transcription)
+#         session.add(word)
+#         await session.flush()  # Получаем ID
+
+#         # 2. Переводы
+#         for t in word_data.translations:
+#             lang_id = language_map.get(t.lang)
+#             if not lang_id:
+#                 raise HTTPException(status_code=400, detail=f"Unknown language code: {t.lang}")
+#             session.add(WordTranslation(word_id=word.id, language_id=lang_id, text=t.text))
+
+#         # 3. Примеры
+#         for ex in word_data.examples:
+#             lang_id = language_map.get(ex.lang)
+#             if not lang_id:
+#                 raise HTTPException(status_code=400, detail=f"Unknown language code in example: {ex.lang}")
+#             example = Example(word_id=word.id)
+#             session.add(example)
+#             await session.flush()
+#             session.add(ExampleTranslation(example_id=example.id, language_id=lang_id, text=ex.text))
+
+#         # 4. Категории
+#         for cat_name in word_data.categories:
+#             cat_id = category_map.get(cat_name)
+#             if not cat_id:
+#                 # Добавляем только 1 раз, если ещё не создана
+#                 if cat_name in new_categories:
+#                     cat_id = new_categories[cat_name]
+#                 else:
+#                     new_cat = Category(name=cat_name, owner_id=None)
+#                     session.add(new_cat)
+#                     await session.flush()
+#                     cat_id = new_cat.id
+#                     new_categories[cat_name] = cat_id
+#                     category_map[cat_name] = cat_id
+
+#             # Прямая вставка в связующую таблицу
+#             await session.execute(
+#                 category_word_table.insert().values(category_id=cat_id, word_id=word.id)
+#             )
+
+#     await session.commit()
+#     return {"status": "success", "words_imported": len(payload.data)}
+########################################################################
+
 
 # @router.post("/create_my_cats")
 # async def create_my_cats(session: AsyncSession = Depends(get_async_session)):
@@ -101,7 +230,7 @@ async def init_public_key():
 #     }
 
 #     for i in cats:
-#         session.add(Category(name=i))  
+#         session.add(Category(name=i))
 
 #     await session.commit()
 

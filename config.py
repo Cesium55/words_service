@@ -1,5 +1,7 @@
 import os
 
+APP_DEBUG = os.environ.get("APP_DEBUG") or True
+
 DB_SYNC_DRIVER = os.environ.get("DB_SYNC_DRIVER")
 DB_ASYNC_DRIVER = os.environ.get("DB_ASYNC_DRIVER")
 DB_HOST = os.environ.get("DB_HOST")
