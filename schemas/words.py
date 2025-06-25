@@ -22,6 +22,9 @@ class WordsImportRequest(BaseModel):
     words: List[WordInput]
     owner_id: int | None = None
 
+class WordsByIDs(BaseModel):
+    ids: List[int]
+
 
 
 ########################################

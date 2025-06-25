@@ -4,6 +4,8 @@ from database import get_async_session
 from models import Category, Word
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from middleware.AuthMiddleware import user_required
+
 
 router = APIRouter(prefix="/categories")
 
@@ -17,7 +19,7 @@ async def all_categories(session: AsyncSession = Depends(get_async_session)):
     return {"data": categories}
 
 
-@router.get("/{category_id}/words")
+@router.get("/{category_id}/words", dependencies=[Depends(user_required)])
 async def category_words(
     category_id: int, session: AsyncSession = Depends(get_async_session)
 ):
@@ -29,5 +31,6 @@ async def category_words(
 
     data = await session.execute(query)
     return {
-        "data": data.scalars().all()
+        "data": data.scalar_one_or_none()
     }
+

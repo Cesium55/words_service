@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import categories_router, debug_init_router, admin_router
+from routes import categories_router, debug_init_router, admin_router, words_router
 from fastapi.middleware.cors import CORSMiddleware
 from config import APP_DEBUG
 
@@ -20,6 +20,7 @@ if APP_DEBUG:
 
 app.include_router(categories_router)
 app.include_router(admin_router)
+app.include_router(words_router)
 
 
 @app.get("/")

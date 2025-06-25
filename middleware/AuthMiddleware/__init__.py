@@ -1,1 +1,1 @@
-from .AuthMiddleware import admin_required
+from .AuthMiddleware import admin_required, user_required
