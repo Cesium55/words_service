@@ -10,14 +10,17 @@ category_word_table = Table(
     Column("word_id", Integer, ForeignKey("words.id"), primary_key=True),
 )
 
+
 class Category(Base):
     __tablename__ = "categories"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
-    owner_id = Column(Integer, nullable=True)
+    owner_id = Column(Integer, nullable=False, default=-1)
     sort_order = Column(Integer, default=0)
 
-    words = relationship("Word", secondary=category_word_table, back_populates="categories")
+    words = relationship(
+        "Word", secondary=category_word_table, back_populates="categories"
+    )
     translations = relationship("CategoryTranslation", back_populates="category")
 
     def __str__(self):
@@ -30,7 +33,7 @@ class Category(Base):
 class Language(Base):
     __tablename__ = "languages"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    code = Column(String, unique=True, nullable=False) 
+    code = Column(String, unique=True, nullable=False)
     name = Column(String, nullable=False)
 
     def __str__(self):
@@ -43,12 +46,18 @@ class Language(Base):
 class Word(Base):
     __tablename__ = "words"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    owner_id = Column(Integer, nullable=True)
-    transcription = Column(Text, nullable=False)
+    owner_id = Column(Integer, nullable=False, default=-1)
+    transcription = Column(Text, nullable=True)
 
-    translations = relationship("WordTranslation", back_populates="word", cascade="all, delete-orphan")
-    examples = relationship("Example", back_populates="word", cascade="all, delete-orphan")
-    categories = relationship("Category", secondary=category_word_table, back_populates="words")
+    translations = relationship(
+        "WordTranslation", back_populates="word", cascade="all, delete-orphan"
+    )
+    examples = relationship(
+        "Example", back_populates="word", cascade="all, delete-orphan"
+    )
+    categories = relationship(
+        "Category", secondary=category_word_table, back_populates="words"
+    )
 
 
 class WordTranslation(Base):
@@ -68,7 +77,9 @@ class Example(Base):
     word_id = Column(Integer, ForeignKey("words.id"), nullable=False)
 
     word = relationship("Word", back_populates="examples")
-    translations = relationship("ExampleTranslation", back_populates="example", cascade="all, delete-orphan")
+    translations = relationship(
+        "ExampleTranslation", back_populates="example", cascade="all, delete-orphan"
+    )
 
 
 class ExampleTranslation(Base):

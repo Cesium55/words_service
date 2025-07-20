@@ -14,3 +14,5 @@ AUTH_GET_PUBLIC_KEY_URL = AUTH_SERVICE_URL + "/api/v1/public-key"
 
 REDIS_HOST = os.environ.get("REDIS_HOST")
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
+
+RABBIT_HOST = os.environ.get("RABBIT_HOST")

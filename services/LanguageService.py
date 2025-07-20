@@ -6,9 +6,16 @@ from models import Language
 from schemas.languages import LanguageCreate
 from database import get_async_session
 
+
 class LanguageService:
-    async def create_language(self, language_data: LanguageCreate, session: AsyncSession = Depends(get_async_session)):
-        result = await session.execute(select(Language).where(Language.code == language_data.code))
+    async def create_language(
+        self,
+        language_data: LanguageCreate,
+        session: AsyncSession = Depends(get_async_session),
+    ):
+        result = await session.execute(
+            select(Language).where(Language.code == language_data.code)
+        )
         existing = result.scalar_one_or_none()
 
         if existing:

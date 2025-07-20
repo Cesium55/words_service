@@ -5,8 +5,8 @@ import asyncio
 
 logger = Logger()
 
-class JWTManager:
 
+class JWTManager:
 
     def get_data(self, token: str, public_key):
         try:

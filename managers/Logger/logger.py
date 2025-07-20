@@ -5,18 +5,19 @@ from typing import Literal
 import logging
 
 
-
 class AsyncLogger:
     def __init__(self, filename: str = "app.log"):
         self.filename = filename
         self.lock = asyncio.Lock()
 
-    async def log(self, message: str, level: Literal["INFO", "WARNING", "ERROR"] = "INFO"):
+    async def log(
+        self, message: str, level: Literal["INFO", "WARNING", "ERROR"] = "INFO"
+    ):
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")
         log_message = f"[{timestamp}] [{level}] {message}\n"
 
         async with self.lock:
-            async with aiofiles.open(self.filename, mode='a') as f:
+            async with aiofiles.open(self.filename, mode="a") as f:
                 await f.write(log_message)
 
     async def info(self, message: str):
@@ -27,8 +28,6 @@ class AsyncLogger:
 
     async def error(self, message: str):
         await self.log(message, "ERROR")
-
-
 
 
 class Logger:

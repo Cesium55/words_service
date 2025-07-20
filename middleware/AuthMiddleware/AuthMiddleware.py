@@ -32,7 +32,7 @@ async def admin_required(request: Request):
     await logger.info(f"JWT decoded data: '{data}', token:{token}")
     if (not data) or (not data.get("is_admin")):
         raise ex403
-    
+
     return data
 
 
@@ -43,7 +43,7 @@ async def user_required(request: Request):
     auth_manager = AuthManager()
     data = jwt_m.get_data(token, await auth_manager.get_auth_public_key())
     await logger.info(f"JWT decoded data: '{data}', token:{token}")
-    if (not data):
+    if not data:
         raise ex401
-    
+
     return data

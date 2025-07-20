@@ -18,6 +18,7 @@ router = APIRouter(prefix="/admin", dependencies=[Depends(admin_required)])
 async def admin_index():
     return {"message": "Welcome admin!"}
 
+
 @router.post(
     "/languages",
     # response_model=LanguageCreate,
@@ -28,4 +29,3 @@ async def create_language(
     language_data: LanguageCreate, session: AsyncSession = Depends(get_async_session)
 ):
     return await LanguageService().create_language(language_data, session)
-
