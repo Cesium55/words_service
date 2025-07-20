@@ -35,7 +35,7 @@ async def category_words(
     query = (
         select(Category)
         .where(Category.id == category_id)
-        .options(selectinload(Category.words))
+        .options(selectinload(Category.words).selectinload(Word.translations))
     )
 
     data = await session.execute(query)
